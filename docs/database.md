@@ -120,4 +120,72 @@ func GetUsers(c *gin.Context) {
 }
 ```
 
-This structure keeps your code clean, maintainable, and easy to extend as your project grows.
+Yes, `"file://migrations"` refers to a directory named `migrations` located in the same directory as your `main.go` file or within your project's root directory. You can place your SQL migration scripts in this `migrations` directory, and the `golang-migrate` library will read and apply them.
+
+### How to Set Up the `migrations` Directory:
+1. **Create the Directory**:
+   - In your project directory (where `main.go` is located), create a folder named `migrations`:
+     ```bash
+     mkdir migrations
+     ```
+
+2. **Add Migration Files**:
+   - Inside the `migrations` folder, create your migration files. These files should be named with a version number and description to ensure they are applied in order.
+   - Example:
+     ```bash
+     migrations/
+     ├── 001_create_users_table.up.sql
+     ├── 001_create_users_table.down.sql
+     ├── 002_add_roles_table.up.sql
+     └── 002_add_roles_table.down.sql
+     ```
+
+   - The `.up.sql` file contains the SQL statements for applying the migration (e.g., creating tables).
+   - The `.down.sql` file contains the SQL statements for rolling back the migration (e.g., dropping tables).
+
+### Example Migration File (`001_create_users_table.up.sql`):
+```sql
+CREATE TABLE users (
+    id SERIAL PRIMARY KEY,
+    username VARCHAR(255) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    role VARCHAR(50) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+```
+
+### Running the Migrations:
+1. **Ensure the `migrations` directory path is correct**:
+   - Use the path `"file://migrations"` if the `migrations` directory is in the same folder as `main.go`.
+   - Adjust the path accordingly if your `migrations` folder is nested or in a different directory (e.g., `"file://db/migrations"`).
+
+2. **Run Migrations in Code**:
+   ```go
+   func main() {
+       dbConn, err := db.InitDB()
+       if err != nil {
+           log.Fatal().Msg("Could not establish a database connection")
+       }
+       defer dbConn.Close()
+
+       // Run database migrations
+       runMigrations(dbConn)
+
+       // Start the web server
+       r := gin.Default()
+       r.POST("/login", handlers.Login)
+       protected := r.Group("/protected")
+       protected.Use(middleware.JWTAuthMiddleware())
+       {
+           protected.GET("/", handlers.ProtectedEndpoint)
+       }
+       log.Info().Msg("Server is starting on port 8080")
+       r.Run("0.0.0.0:8080")
+   }
+   ```
+
+### Final Tips:
+- **Order of Migrations**: Ensure the migration files are numbered sequentially (e.g., `001`, `002`) to apply them in the correct order.
+- **Rollback**: The `.down.sql` file should contain the reverse logic of `.up.sql` to undo changes if needed.
+
+With this setup, your migrations will be organized and ready to be run automatically when your application starts.
