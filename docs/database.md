@@ -1,15 +1,54 @@
-### Troubleshooting
+## Troubleshooting
+
+### Auth
+
+Commands for linux environments:
 
 ````shell
 export PGPASSWORD='secure_password'
 psql -h localhost -U erm_user -d erm_database
 ````
 
+alternatively, if you are on windows:
+
 ````powershell
 $env:PGPASSWORD = 'secure_password'
 psql -h localhost -U erm_user -d erm_database
 ````
 
+### psql commands
+
+To show tables in `psql`, the interactive terminal for PostgreSQL, you can use the `\dt` command. Here’s how:
+
+1. Start `psql` and connect to your database:
+   ```bash
+   psql -U your_username -d your_database
+   ```
+
+2. Once connected, list all tables by running:
+   ```sql
+   \dt
+   ```
+
+### Explanation:
+- `\dt` lists all tables in the current schema.
+- If you want to list tables in a specific schema, you can use:
+  ```sql
+  \dt schema_name.*
+  ```
+
+### Additional Commands:
+- To show all database objects, including tables, views, and indexes, use:
+  ```sql
+  \d
+  ```
+
+- For more detailed information about a specific table, use:
+  ```sql
+  \d table_name
+  ```
+
+This should give you a clear overview of the tables present in your PostgreSQL database.
 
 
 # DB documentation [Needs to be refined, hardcopied]

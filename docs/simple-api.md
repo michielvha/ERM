@@ -216,5 +216,6 @@ func GenerateJWT(username string) (string, error) {
    ````powershell
    $response = Invoke-RestMethod -Method Post -Uri http://localhost:8080/login -Body '{"username": "testuser", "password": "password"}' -ContentType "application/json"
    $token = $response.token
+   $token
    Invoke-RestMethod -Method Get -Uri http://localhost:8080/protected -Headers @{ Authorization = "Bearer $token" }
    ````
