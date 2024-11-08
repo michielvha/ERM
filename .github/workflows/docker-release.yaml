@@ -12,7 +12,7 @@ on:
       - 'docs/**'  # this only triggers pipeline when updates to path dir are made
       - 'readme.md'
       - '.gitignore'
-      - '.github/**'
+#      - '.github/**'
   workflow_dispatch:  # Allows manual triggering of the workflow
 
 jobs:
@@ -46,7 +46,7 @@ jobs:
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
-          context: ./
+#          context: .
           push: true
           tags: |
             edgeforge/erm:latest
