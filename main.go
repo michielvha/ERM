@@ -8,6 +8,7 @@ import (
     "os"
 
     // actually used
+    "erm/db"
     "github.com/gin-gonic/gin"
     "github.com/MKTHEPLUGG/ERM/middleware"
     "github.com/MKTHEPLUGG/ERM/handlers"
@@ -34,6 +35,14 @@ func setEnvVar() {
 }
 
 func main() {
+    // Initialize the database connection
+    dbConn, err := db.InitDB()
+    if err != nil {
+        log.Fatal("Could not establish a database connection")
+    }
+    defer dbConn.Close() // Ensure that the connection is closed when the program exits
+
+    // Create a new Gin Router
     r := gin.Default()
 
     // Public route for login (no JWT middleware)
