@@ -3,15 +3,21 @@ package middleware
 import (
     "net/http"
     "strings"
+    "log"
+    "os"
 
     "github.com/gin-gonic/gin"
     "github.com/golang-jwt/jwt/v5"
 )
 
 // Replace with a secure secret in production
-var jwtSecret = []byte("yoursecuresecret")
+// var jwtSecret = []byte("yoursecuresecret")
 
-// JWTAuthMiddleware validates the JWT token
+// Production safe way of handling secret via env var.
+var jwtSecret = []byte(os.Getenv("JWT_SECRET"))
+
+
+// JWTAuthMiddleware: validates the JWT token
 func JWTAuthMiddleware() gin.HandlerFunc {
     return func(c *gin.Context) {
         // Get the Authorization header
@@ -19,6 +25,7 @@ func JWTAuthMiddleware() gin.HandlerFunc {
 
         // Check if the token is present and starts with "Bearer "
         if tokenString == "" || !strings.HasPrefix(tokenString, "Bearer ") {
+//            log.Printf("Missing or malformed token error: %v", tokenString)  // only for debug, exposes token serverside, bad practise.
             c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Missing or malformed token"})
             return
         }
@@ -37,11 +44,13 @@ func JWTAuthMiddleware() gin.HandlerFunc {
 
         // Handle token parsing errors
         if err != nil {
+            log.Printf("Token parsing error: %v", err) // Logs internally; do not expose this to clients
             c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Invalid or malformed token"})
             return
         }
 
         if !token.Valid {
+            log.Printf("Token validation failed: token is not valid") // Logs when the token is invalid
             c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Invalid token"})
             return
         }

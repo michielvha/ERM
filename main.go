@@ -1,10 +1,37 @@
 package main
 
 import (
+    // only needed to autogen env var
+    "crypto/rand"
+    "encoding/base64"
+    "log"
+    "os"
+
+    // actually used
     "github.com/gin-gonic/gin"
     "github.com/MKTHEPLUGG/ERM/middleware"
     "github.com/MKTHEPLUGG/ERM/handlers"
 )
+
+// generateRandomSecret creates a 256-bit (32-byte) random secret
+func generateRandomSecret() string {
+    secret := make([]byte, 32)
+    _, err := rand.Read(secret)
+    if err != nil {
+        log.Fatalf("Failed to generate secret: %v", err)
+    }
+    return base64.StdEncoding.EncodeToString(secret)
+}
+
+// setEnvVar sets the environment variable for JWT_SECRET
+func setEnvVar() {
+    secret := generateRandomSecret()
+    err := os.Setenv("JWT_SECRET", secret)
+    if err != nil {
+        log.Fatalf("Failed to set environment variable: %v", err)
+    }
+    log.Printf("Environment variable JWT_SECRET set: %s", secret) // For testing purposes only; remove this log in production
+}
 
 func main() {
     r := gin.Default()
