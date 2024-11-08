@@ -9,7 +9,7 @@ import (
     "github.com/golang-jwt/jwt/v5"
 )
 
-var jwtSecret = []byte("your-secure-secret") // Replace with a secure secret in production
+var jwtSecret = []byte("yoursecuresecret") // Replace with a secure secret in production
 
 // JWTAuthMiddleware validates the JWT token
 func JWTAuthMiddleware() gin.HandlerFunc {
