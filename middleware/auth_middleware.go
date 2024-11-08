@@ -35,20 +35,9 @@ func JWTAuthMiddleware() gin.HandlerFunc {
             return jwtSecret, nil
         })
 
-        // Handle token parsing errors and invalid tokens
+        // Handle token parsing errors
         if err != nil {
-            var validationError *jwt.ValidationError
-            if errors.As(err, &validationError) {
-                if validationError.Errors&jwt.ErrSignatureInvalid != 0 {
-                    c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Invalid signature"})
-                } else if validationError.Errors&jwt.ErrExpired != 0 {
-                    c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Token has expired"})
-                } else {
-                    c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Token validation error"})
-                }
-            } else {
-                c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Failed to parse token"})
-            }
+            c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Invalid or malformed token"})
             return
         }
 

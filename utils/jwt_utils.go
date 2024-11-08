@@ -5,7 +5,7 @@ import (
     "github.com/golang-jwt/jwt/v5"
 )
 
-var jwtSecret = []byte("your-secure-secret") // Replace with a secure secret in production
+var jwtSecret = []byte("yoursecuresecret") // Replace with a secure secret in production
 
 // GenerateJWT generates a new JWT token
 func GenerateJWT(username string) (string, error) {
