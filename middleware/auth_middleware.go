@@ -30,17 +30,19 @@ func JWTAuthMiddleware() gin.HandlerFunc {
         token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
             // Validate the signing method
             if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-                return nil, jwt.NewValidationError("unexpected signing method", jwt.ErrSignatureInvalid)
+                return nil, jwt.ErrSignatureInvalid
             }
             return jwtSecret, nil
         })
 
         // Handle token parsing errors and invalid tokens
         if err != nil {
-            if ve, ok := err.(*jwt.ValidationError); ok {
-                // Provide more specific error messages based on the type of validation error
-                if ve.Errors&jwt.ErrSignatureInvalid != 0 {
+            var validationError *jwt.ValidationError
+            if errors.As(err, &validationError) {
+                if validationError.Errors&jwt.ErrSignatureInvalid != 0 {
                     c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Invalid signature"})
+                } else if validationError.Errors&jwt.ErrExpired != 0 {
+                    c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Token has expired"})
                 } else {
                     c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Token validation error"})
                 }
@@ -66,4 +68,3 @@ func JWTAuthMiddleware() gin.HandlerFunc {
         c.Next()
     }
 }
-
