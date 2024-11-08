@@ -1,0 +1,33 @@
+services:
+  api-app:
+    image: edgeforge/erm:latest
+    container_name: ERM
+    ports:
+      - "8080:8080"  # Maps port 8080 on host to port 80 in the container for nginx
+#    depends_on:
+#      - mysql
+    networks:
+      - erm-network
+#    volumes:            # Enable volume to have persistent container storage.
+#      - ./:/var/www
+
+#  mysql:
+#    image: mysql:8.0
+#    container_name: mysql
+#    environment:
+#      MYSQL_ROOT_PASSWORD: password
+#      MYSQL_DATABASE: erm
+#    ports:
+#      - "3306:3306"  # Exposes MySQL on port 3306
+#    volumes:
+#      - mysql_data:/var/lib/mysql  # Persistent storage for MySQL data
+#    networks:
+#      - laravel-network
+
+networks:
+  erm-network:
+    driver: bridge
+
+#volumes:
+#  mysql_data:
+#    driver: local

@@ -1,7 +1,7 @@
 package main
 
 import (
-    // only needed to autogen env var
+    // only needed to autogen env var, in theory we could keep this behaviour, but allow it to be overwritten by user. in this case if it's not set the binary will still run.
     "crypto/rand"
     "encoding/base64"
     "log"
@@ -46,5 +46,5 @@ func main() {
         protected.GET("/", handlers.ProtectedEndpoint)
     }
 
-    r.Run(":8080") // Run the server on port 8080
+    r.Run("0.0.0.0:8080") // Run the server on port 8080
 }
