@@ -23,6 +23,7 @@ func generateRandomSecret() string {
     return base64.StdEncoding.EncodeToString(secret)
 }
 
+
 // setEnvVar sets the environment variable for JWT_SECRET
 func setEnvVar() {
     secret := generateRandomSecret()
