@@ -5,9 +5,12 @@ import (
     "crypto/rand"
     "encoding/base64"
     "log"
-    "os"
+
 
     // actually used
+    "os"
+    "github.com/rs/zerolog"
+    "github.com/rs/zerolog/log"
     "erm/db"
     "github.com/gin-gonic/gin"
     "github.com/MKTHEPLUGG/ERM/middleware"
@@ -19,7 +22,7 @@ func generateRandomSecret() string {
     secret := make([]byte, 32)
     _, err := rand.Read(secret)
     if err != nil {
-        log.Fatalf("Failed to generate secret: %v", err)
+        log.Fatal().Msgf("Failed to generate secret: %v", err)
     }
     return base64.StdEncoding.EncodeToString(secret)
 }
@@ -29,16 +32,31 @@ func setEnvVar() {
     secret := generateRandomSecret()
     err := os.Setenv("JWT_SECRET", secret)
     if err != nil {
-        log.Fatalf("Failed to set environment variable: %v", err)
+        log.Fatal().Msgf("Failed to set environment variable: %v", err)
     }
-    log.Printf("Environment variable JWT_SECRET set: %s", secret) // For testing purposes only; remove this log in production
+    log.Info().Msgf("Environment variable JWT_SECRET set: %s", secret) // For testing purposes only; remove this log in production
+}
+
+// function to init our env
+func init(){
+    // initialize zerologger
+    zerolog.SetGlobalLevel(zerolog.InfoLevel)
+    log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
+
+    // Examples
+//     log.Info().Msg("Application started")
+//     log.Warn().Msg("This is a warning from someFunction")
+//     log.Error().Msg("This is an error from someFunction")
+
 }
 
 func main() {
     // Initialize the database connection
     dbConn, err := db.InitDB()
     if err != nil {
-        log.Fatal("Could not establish a database connection")
+        log.Fatal().Msg("Could not establish a database connection")
+    } else {
+        log.Info().Msg("Establish database connection")
     }
     defer dbConn.Close() // Ensure that the connection is closed when the program exits
 
@@ -56,4 +74,5 @@ func main() {
     }
 
     r.Run("0.0.0.0:8080") // Run the server on port 8080
+    log.Info().Msg("Server started on 0.0.0.0:8080")
 }

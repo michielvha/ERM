@@ -2,6 +2,8 @@ services:
   erm-app:
     image: edgeforge/erm
     container_name: erm
+    depends_on:
+      - db
     ports:
       - "8080:8080" # Maps the container's port 8080 to the host's port 8080
 #    environment:
