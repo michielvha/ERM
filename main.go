@@ -17,9 +17,13 @@ import (
     "github.com/MKTHEPLUGG/ERM/handlers"
     "github.com/golang-migrate/migrate/v4"
     "github.com/golang-migrate/migrate/v4/database/postgres"
-    _ "github.com/golang-migrate/migrate/v4/source/file"
+    _ "github.com/golang-migrate/migrate/v4/source/iofs"
     "database/sql"
 )
+// Embed the `migrations` directory and its content
+//go:embed migrations/*.sql
+var migrationFiles embed.FS
+
 // function to init our env
 func init(){
     // initialize zerologger
@@ -54,20 +58,23 @@ func setEnvVar() {
 }
 
 func runMigrations(db *sql.DB) {
+    log.Info().Msg("Starting migrations")
+
     driver, err := postgres.WithInstance(db, &postgres.Config{})
     if err != nil {
-        log.Fatal().Msgf("Failed to create migration driver:", err)
+        log.Fatal().Msgf("Failed to create migration driver: %v", err)
     }
-
+    // migrate
     m, err := migrate.NewWithDatabaseInstance(
-        "file://migrations", // Replace with your migrations directory
+        "iofs://migrations", // Embed source scheme
         "postgres", driver)
     if err != nil {
         log.Fatal().Msgf("Failed to create migration instance:", err)
     }
 
+    // m.Up() Runs all the .up.sql files to apply migrations, opposite is m.Down()
     if err := m.Up(); err != nil && err != migrate.ErrNoChange {
-        log.Fatal().Msgf("Migration failed:", err)
+        log.Fatal().Msgf("Migration failed: %v", err)
     } else {
         log.Info().Msg("Migrations applied successfully")
     }

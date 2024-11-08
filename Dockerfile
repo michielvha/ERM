@@ -31,8 +31,11 @@ WORKDIR /app
 # Copy the Pre-built binary file from the builder
 COPY --from=builder /app/main .
 
+# Copy the migrations directory from the builder => embedded in to binary
+#COPY --from=builder /app/migrations ./migrations
+
 # Change ownership of the binary to the non-root user
-RUN chown appuser:appgroup /app/main
+RUN chown appuser:appgroup /app
 
 # Switch to the non-root user
 USER appuser

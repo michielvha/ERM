@@ -1,3 +1,20 @@
+### Troubleshooting
+
+````shell
+export PGPASSWORD='secure_password'
+psql -h localhost -U erm_user -d erm_database
+````
+
+````powershell
+$env:PGPASSWORD = 'secure_password'
+psql -h localhost -U erm_user -d erm_database
+````
+
+
+
+# DB documentation [Needs to be refined, hardcopied]
+
+
 To incorporate PostgreSQL into your project, here’s how you can structure it:
 
 **Add PostgreSQL to Docker Compose**:
