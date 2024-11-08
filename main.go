@@ -1,24 +1,30 @@
 package main
 
 import (
-    // only needed to autogen env var, in theory we could keep this behaviour, but allow it to be overwritten by user. in this case if it's not set the binary will still run.
+    // Only needed to autogen env var
     "crypto/rand"
     "encoding/base64"
-//     "log"
 
-    // actually used
+    // Used for embedding files
     "embed"
     "os"
+    "database/sql"
+
+    // Logging library
     "github.com/rs/zerolog"
     "github.com/rs/zerolog/log"
+
+    // Project-specific packages
     "github.com/MKTHEPLUGG/ERM/db"
     "github.com/gin-gonic/gin"
     "github.com/MKTHEPLUGG/ERM/middleware"
     "github.com/MKTHEPLUGG/ERM/handlers"
+
+    // Migration libraries
     "github.com/golang-migrate/migrate/v4"
     "github.com/golang-migrate/migrate/v4/database/postgres"
-    _ "github.com/golang-migrate/migrate/v4/source/iofs"
-    "database/sql"
+    "github.com/golang-migrate/migrate/v4/source/iofs"
+    _ "github.com/lib/pq"
 )
 // Embed the `migrations` directory and its content
 //go:embed migrations/*.sql
@@ -60,19 +66,25 @@ func setEnvVar() {
 func runMigrations(db *sql.DB) {
     log.Info().Msg("Starting migrations")
 
+    // Create a new iofs driver for the embedded migrations
+    sourceDriver, err := iofs.New(migrationFiles, "migrations")
+    if err != nil {
+        log.Fatal().Msgf("Failed to create iofs source driver: %v", err)
+    }
+
+    // Create a database driver
     driver, err := postgres.WithInstance(db, &postgres.Config{})
     if err != nil {
         log.Fatal().Msgf("Failed to create migration driver: %v", err)
     }
-    // migrate
-    m, err := migrate.NewWithDatabaseInstance(
-        "iofs://migrations", // Embed source scheme
-        "postgres", driver)
+
+    // Create the migration instance using the iofs source and database driver
+    m, err := migrate.NewWithInstance("iofs", sourceDriver, "postgres", driver)
     if err != nil {
-        log.Fatal().Msgf("Failed to create migration instance:", err)
+        log.Fatal().Msgf("Failed to create migration instance: %v", err)
     }
 
-    // m.Up() Runs all the .up.sql files to apply migrations, opposite is m.Down()
+    // Run the migrations
     if err := m.Up(); err != nil && err != migrate.ErrNoChange {
         log.Fatal().Msgf("Migration failed: %v", err)
     } else {
