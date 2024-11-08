@@ -3,7 +3,7 @@ package handlers
 import (
     "net/http"
     "github.com/gin-gonic/gin"
-    "erm/db"
+    "github.com/MKTHEPLUGG/ERM/db"
 )
 
 func GetUsers(c *gin.Context) {

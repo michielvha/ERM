@@ -7,10 +7,11 @@ import (
 //     "log"
 
     // actually used
+    "embed"
     "os"
     "github.com/rs/zerolog"
     "github.com/rs/zerolog/log"
-    "erm/db"
+    "github.com/MKTHEPLUGG/ERM/db"
     "github.com/gin-gonic/gin"
     "github.com/MKTHEPLUGG/ERM/middleware"
     "github.com/MKTHEPLUGG/ERM/handlers"
