@@ -20,6 +20,18 @@ import (
     _ "github.com/golang-migrate/migrate/v4/source/file"
     "database/sql"
 )
+// function to init our env
+func init(){
+    // initialize zerologger
+    zerolog.SetGlobalLevel(zerolog.InfoLevel)
+    log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
+
+//     // Examples
+//     log.Info().Msg("Application started")
+//     log.Warn().Msg("This is a warning from someFunction")
+//     log.Error().Msg("This is an error from someFunction")
+
+}
 
 // generateRandomSecret creates a 256-bit (32-byte) random secret
 func generateRandomSecret() string {
@@ -38,40 +50,27 @@ func setEnvVar() {
     if err != nil {
         log.Fatal().Msgf("Failed to set environment variable: %v", err)
     }
-    log.Info().Msgf("Environment variable JWT_SECRET set: %s", secret) // For testing purposes only; remove this log in production
+//    log.Info().Msgf("Environment variable JWT_SECRET set: %s", secret) // For testing purposes only; remove this log in production
 }
 
 func runMigrations(db *sql.DB) {
     driver, err := postgres.WithInstance(db, &postgres.Config{})
     if err != nil {
-        log.Fatal("Failed to create migration driver:", err)
+        log.Fatal().Msgf("Failed to create migration driver:", err)
     }
 
     m, err := migrate.NewWithDatabaseInstance(
         "file://migrations", // Replace with your migrations directory
         "postgres", driver)
     if err != nil {
-        log.Fatal("Failed to create migration instance:", err)
+        log.Fatal().Msgf("Failed to create migration instance:", err)
     }
 
     if err := m.Up(); err != nil && err != migrate.ErrNoChange {
-        log.Fatal("Migration failed:", err)
+        log.Fatal().Msgf("Migration failed:", err)
     } else {
-        log.Println("Migrations applied successfully")
+        log.Info().Msg("Migrations applied successfully")
     }
-}
-
-// function to init our env
-func init(){
-    // initialize zerologger
-    zerolog.SetGlobalLevel(zerolog.InfoLevel)
-    log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
-
-    // Examples
-//     log.Info().Msg("Application started")
-//     log.Warn().Msg("This is a warning from someFunction")
-//     log.Error().Msg("This is an error from someFunction")
-
 }
 
 func main() {
@@ -86,7 +85,6 @@ func main() {
 
     // Run database migrations
     runMigrations(dbConn)
-
 
     // Create a new Gin Router
     r := gin.Default()
