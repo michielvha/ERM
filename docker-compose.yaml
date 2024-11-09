@@ -2,6 +2,8 @@ services:
   erm-app:
     image: edgeforge/erm
     container_name: erm
+    environment:
+      ADMIN_PASSWORD: secure_admin_password
     depends_on:
       - db
     ports:
