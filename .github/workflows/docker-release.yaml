@@ -52,7 +52,7 @@ jobs:
             edgeforge/erm:latest
             edgeforge/erm:${{ steps.gitversion.outputs.semVer }}
             edgeforge/erm:${{ github.sha }}
-          platforms: linux/amd64,linux/arm64  # Optional: for multi-architecture support
+          platforms: linux/amd64 #,linux/arm64  # Optional: for multi-architecture support
 
       - name: Log out from Docker Hub
         run: docker logout
