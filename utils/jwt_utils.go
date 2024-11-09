@@ -1,23 +1,29 @@
 package utils
 
 import (
+    "github.com/golang-jwt/jwt/v5"
     "time"
     "os"
-    "github.com/golang-jwt/jwt/v5"
 )
 
-// var jwtSecret = []byte("yoursecuresecret") // Replace with a secure secret in production
-// Production safe way of handling secret via env var.
-var jwtSecret = []byte(os.Getenv("JWT_SECRET"))
+var jwtKey = []byte(os.Getenv("JWT_SECRET"))
 
+type Claims struct {
+    Username string `json:"username"`
+    Role     string `json:"role"`
+    jwt.RegisteredClaims
+}
 
-// GenerateJWT generates a new JWT token
-func GenerateJWT(username string) (string, error) {
-    claims := jwt.MapClaims{
-        "username": username,
-        "exp":      time.Now().Add(time.Hour * 1).Unix(), // Token expires in 1 hour
+func GenerateJWT(username, role string) (string, error) {
+    expirationTime := time.Now().Add(24 * time.Hour)
+    claims := &Claims{
+        Username: username,
+        Role:     role,
+        RegisteredClaims: jwt.RegisteredClaims{
+            ExpiresAt: jwt.NewNumericDate(expirationTime),
+        },
     }
 
     token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-    return token.SignedString(jwtSecret)
+    return token.SignedString(jwtKey)
 }
