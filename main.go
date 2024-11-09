@@ -93,6 +93,9 @@ func runMigrations(db *sql.DB) {
 }
 
 func main() {
+    // Run database migrations
+    runMigrations(dbConn)
+
     // Initialize the database connection
     dbConn, err := db.InitDB()
     if err != nil {
@@ -101,9 +104,6 @@ func main() {
         log.Info().Msg("Establish database connection")
     }
     defer dbConn.Close() // Ensure that the connection is closed when the program exits
-
-    // Run database migrations
-    runMigrations(dbConn)
 
     // Create a new Gin Router
     r := gin.Default()
