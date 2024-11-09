@@ -5,15 +5,15 @@
 Commands for linux environments:
 
 ````shell
-export PGPASSWORD='secure_password'
+export PGPASSWORD='secure_admin_password'
 psql -h localhost -U erm_user -d erm_database
 ````
 
 alternatively, if you are on windows:
 
 ````powershell
-$env:PGPASSWORD = 'secure_password'
-psql -h localhost -U erm_user -d erm_database
+$env:PGPASSWORD = 'secure_admin_password'
+psql -h localhost -U admin -d secure_admin_password
 ````
 
 ### PostgreSQL commands
