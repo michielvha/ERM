@@ -84,6 +84,19 @@ func runMigrations(db *sql.DB) {
         log.Fatal().Msgf("Failed to create migration instance: %v", err)
     }
 
+    // Check if the database is dirty, remove logic for production.
+    version, dirty, err := m.Version()
+    if err != nil && err != migrate.ErrNilVersion {
+        log.Fatal().Msgf("Failed to get migration version: %v", err)
+    }
+
+    if dirty {
+        log.Warn().Msgf("Database is dirty at version %d. Forcing clean state.", version)
+        if err := m.Force(int(version)); err != nil {
+            log.Fatal().Msgf("Failed to force migration version: %v", err)
+        }
+    }
+
     // Run the migrations
     if err := m.Up(); err != nil && err != migrate.ErrNoChange {
         log.Fatal().Msgf("Migration failed: %v", err)

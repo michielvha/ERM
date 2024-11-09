@@ -22,7 +22,13 @@ I've been playing with the idea of a distributed cloud system for a while. Such 
 - **Enhance JWT claims** to include user roles, scopes, or additional data.
 - **Implement token refresh logic** if necessary.
 
+
 ### Change log
+**0.1.28**
+- modified login function to actually care about users, not just the example workflow we had
+
+**0.1.27**
+- Created a migration to provision a user schema.
 
 **0.1.26**
 - Added a database to store users & credentials.
