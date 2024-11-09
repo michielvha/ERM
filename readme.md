@@ -8,22 +8,27 @@ I've been playing with the idea of a distributed cloud system for a while. Such 
 
 ## Nexts steps
 
-- Created db with a user schema
-  - Add admin user in migration
+- Created db with a user schema (x)
+  - Add admin user in migration (x)
   - Provide ability to create new users
   - Create groups for RBAC
 - Rework the login function to actually care about users, not just the example workflow we have right now.
 
 
+
+
 ### Enhancements
 - **Integrate with a real OAuth2 provider** like Auth0 or Keycloak for better security and compliance.
-
 - **Make it run code** I want to use this API to be in front my infrastructure. The first functionality it should do is create custom images with the ARM build framework.
 - **Enhance JWT claims** to include user roles, scopes, or additional data.
 - **Implement token refresh logic** if necessary.
 
 
 ### Change log
+
+**0.1.29**
+- Added a default admin user to database. DB is migrated with placeholder password, after the initial migrate a function is called to update the password to a secure one based on env var.
+
 **0.1.28**
 - modified login function to actually care about users, not just the example workflow we had
 

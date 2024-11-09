@@ -8,8 +8,8 @@ on:
   push:
     branches:
       - main
-    paths-ignore:
-      - 'docs/**'  # this only triggers pipeline when updates to path dir are made
+    paths-ignore:  # Ignore certain paths from triggering the pipeline
+      - 'docs/**'
       - 'readme.md'
       - '.gitignore'
 #      - '.github/**'
