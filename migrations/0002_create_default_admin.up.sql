@@ -18,4 +18,3 @@ BEGIN
         );
     END IF;
 END $$;
-ON CONFLICT (username) DO NOTHING; -- Prevents errors if the admin user already exists
