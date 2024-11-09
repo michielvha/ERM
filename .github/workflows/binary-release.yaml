@@ -2,11 +2,57 @@
 
 
 # 1. Checkout code
-# 2. Call our custom `GitVersion action` to tag the repo
+# 2. Call our custom `GitVersion action` to tag the repo, might not be needed
 # 3. Compile the Go code
 # 4. Sign the package,
 # 4. use go releaser
 # 5. Create release for binary
+
+
+      # Step 3: Build and release binaries using GoReleaser, maybe move to seperate workflow
+#      - name: Set up Go
+#        uses: actions/setup-go@v4
+#        with:
+#          go-version: '1.21'  # Specify the Go version
+#
+#      - name: Install GoReleaser
+#        run: |
+#          curl -sL https://install.goreleaser.com/github-action/release/goreleaser-latest-linux-amd64.tar.gz | tar xz -C /usr/local/bin
+#
+#      - name: Run GoReleaser
+#        run: |
+#          goreleaser release --rm-dist
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+
+# add goreleaser.yml file to project root
+#project_name: myproject
+#builds:
+#  - id: mybuild
+#    main: ./cmd/myproject/main.go
+#    goos:
+#      - linux
+#      - windows
+#      - darwin
+#    goarch:
+#      - amd64
+#      - arm64
+#    ldflags: "-s -w -X main.version={{.Version}}"
+#archives:
+#  - format: tar.gz
+#    name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+#    files:
+#      - LICENSE
+#      - README.md
+#      - CHANGELOG.md
+#      - myproject
+#release:
+#  github:
+#    owner: your-github-username
+#    name: your-repo-name
+#    draft: false
+#    prerelease: false
 
 # Azure pipelines example.
 # Go

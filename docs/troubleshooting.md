@@ -28,5 +28,5 @@ Details on how to troubleshoot the API.
    $response = Invoke-RestMethod -Method Post -Uri http://localhost:8080/login -Body '{"username": "admin", "password": "secure_admin_password"}' -ContentType "application/json"
    $token = $response.token
    $token
-   Invoke-RestMethod -Method Get -Uri http://localhost:8080/protected -Headers @{ Authorization = "Bearer $token" }
+   Invoke-RestMethod -Method Get -Uri http://localhost:8080/v1/protected -Headers @{ Authorization = "Bearer $token" }
    ````
