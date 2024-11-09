@@ -25,6 +25,7 @@ import (
     "github.com/golang-migrate/migrate/v4/database/postgres"
     "github.com/golang-migrate/migrate/v4/source/iofs"
     _ "github.com/lib/pq"
+    "strings"
 )
 // Embed the `migrations` directory and its content
 //go:embed migrations/*.sql
@@ -66,6 +67,14 @@ func setEnvVar() {
 func runMigrations(db *sql.DB) {
     log.Info().Msg("Starting migrations")
 
+    adminPassword := os.Getenv("ADMIN_PASSWORD")
+    migrationContent, err := migrationFiles.ReadFile("migrations/003_create_default_admin.up.sql")
+    if err != nil {
+        log.Fatal().Msgf("Failed to read migration file: %v", err)
+    }
+
+    migrationSQL := strings.ReplaceAll(string(migrationContent), "PLACEHOLDER_PASSWORD", adminPassword)
+
     // Create a new iofs driver for the embedded migrations
     sourceDriver, err := iofs.New(migrationFiles, "migrations")
     if err != nil {
@@ -103,6 +112,14 @@ func runMigrations(db *sql.DB) {
     } else {
         log.Info().Msg("Migrations applied successfully")
     }
+
+    // Execute the modified migration SQL, this is for overwriting the adminPassword placeholder
+    if _, err := db.Exec(migrationSQL); err != nil {
+        log.Fatal().Msgf("Migration failed: %v", err)
+    } else {
+        log.Info().Msg("Admin user migration applied successfully")
+    }
+
 }
 
 func main() {
@@ -115,7 +132,7 @@ func main() {
     }
     defer dbConn.Close() // Ensure that the connection is closed when the program exits
 
-    os.Setenv("ADMIN_PASSWORD", "secure_admin_password")
+    os.Setenv("ADMIN_PASSWORD", "secure_admin_password") // just for debugging purposes
     // Run database migrations
     runMigrations(dbConn)
 
