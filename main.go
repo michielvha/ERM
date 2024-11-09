@@ -64,6 +64,7 @@ func setEnvVar() {
 //    log.Info().Msgf("Environment variable JWT_SECRET set: %s", secret) // For testing purposes only; remove this log in production
 }
 
+// runMigrations runs the database migrations
 func runMigrations(db *sql.DB) {
     log.Info().Msg("Starting migrations")
 
@@ -132,7 +133,7 @@ func main() {
     }
     defer dbConn.Close() // Ensure that the connection is closed when the program exits
 
-    os.Setenv("ADMIN_PASSWORD", "secure_admin_password") // just for debugging purposes
+    os.Setenv("ADMIN_PASSWORD", "secure_admin_password") // just for debugging purposes, should be set via environment variable.
     // Run database migrations
     runMigrations(dbConn)
 
@@ -143,10 +144,11 @@ func main() {
     r.POST("/login", handlers.Login)
 
     // Group routes that require authentication
-    protected := r.Group("/protected")
-    protected.Use(middleware.JWTAuthMiddleware())
+    v1 := r.Group("/v1")
+    v1.Use(middleware.JWTAuthMiddleware())
     {
-        protected.GET("/", handlers.ProtectedEndpoint)
+        v1.GET("/protected", handlers.ProtectedEndpoint)
+        // Add more protected routes here
     }
 
     r.Run("0.0.0.0:8080") // Run the server on port 8080
