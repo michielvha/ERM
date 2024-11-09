@@ -16,7 +16,7 @@ $env:PGPASSWORD = 'secure_password'
 psql -h localhost -U erm_user -d erm_database
 ````
 
-### psql commands
+### PostgreSQL commands
 
 To show tables in `psql`, the interactive terminal for PostgreSQL, you can use the `\dt` command. Here’s how:
 
@@ -51,8 +51,7 @@ To show tables in `psql`, the interactive terminal for PostgreSQL, you can use t
 This should give you a clear overview of the tables present in your PostgreSQL database.
 
 
-# DB documentation [Needs to be refined, hardcopied]
-
+# DB documentation
 
 To incorporate PostgreSQL into your project, here’s how you can structure it:
 
@@ -110,24 +109,24 @@ package db
 import (
     "database/sql"
     _ "github.com/lib/pq" // PostgreSQL driver
-    "log"
+    "github.com/rs/zerolog/log"
 )
 
 func InitDB() (*sql.DB, error) {
-    connStr := "postgresql://erm_user:secure_password@db:5432/erm_database?sslmode=disable"
+    connStr := "postgresql://erm_user:secure_password@db:5432/erm_database?sslmode=disable" // TODO: remove hardcoding from var to env var.
     db, err := sql.Open("postgres", connStr)
     if err != nil {
-        log.Fatal("Failed to connect to the database:", err)
+        log.Fatal().Msgf("Failed to connect to the database:", err)
         return nil, err
     }
 
     // Ping to ensure connection is active
     if err := db.Ping(); err != nil {
-        log.Fatal("Failed to ping the database:", err)
+        log.Fatal().Msgf("Failed to ping the database:", err)
         return nil, err
     }
 
-    log.Println("Database connection established")
+    log.Info().Msg("Database connection established")
     return db, nil
 }
 ```
@@ -143,7 +142,7 @@ package handlers
 import (
     "net/http"
     "github.com/gin-gonic/gin"
-    "your_project/db"
+    "github.com/MKTHEPLUGG/ERM/db"
 )
 
 func GetUsers(c *gin.Context) {
@@ -176,7 +175,6 @@ func GetUsers(c *gin.Context) {
 }
 ```
 
-Yes, `"file://migrations"` refers to a directory named `migrations` located in the same directory as your `main.go` file or within your project's root directory. You can place your SQL migration scripts in this `migrations` directory, and the `golang-migrate` library will read and apply them.
 
 ### How to Set Up the `migrations` Directory:
 1. **Create the Directory**:
@@ -199,6 +197,7 @@ Yes, `"file://migrations"` refers to a directory named `migrations` located in t
    - The `.up.sql` file contains the SQL statements for applying the migration (e.g., creating tables).
    - The `.down.sql` file contains the SQL statements for rolling back the migration (e.g., dropping tables).
 
+
 ### Example Migration File (`001_create_users_table.up.sql`):
 ```sql
 CREATE TABLE users (
@@ -211,37 +210,39 @@ CREATE TABLE users (
 ```
 
 ### Running the Migrations:
-1. **Ensure the `migrations` directory path is correct**:
-   - Use the path `"file://migrations"` if the `migrations` directory is in the same folder as `main.go`.
-   - Adjust the path accordingly if your `migrations` folder is nested or in a different directory (e.g., `"file://db/migrations"`).
+1. **Embed the files into binary**
+   - as to not have to include a migration directory into every container it seemed logical to encorporate that logic into the binary. We use IOFS provider for that.
+   ````bash
+   func runMigrations(db *sql.DB) {
+      log.Info().Msg("Starting migrations")
 
-2. **Run Migrations in Code**:
-   ```go
-   func main() {
-       dbConn, err := db.InitDB()
-       if err != nil {
-           log.Fatal().Msg("Could not establish a database connection")
-       }
-       defer dbConn.Close()
+      // Create a new iofs driver for the embedded migrations
+      sourceDriver, err := iofs.New(migrationFiles, "migrations")
+      if err != nil {
+          log.Fatal().Msgf("Failed to create iofs source driver: %v", err)
+      }
 
-       // Run database migrations
-       runMigrations(dbConn)
+      // Create a database driver
+      driver, err := postgres.WithInstance(db, &postgres.Config{})
+      if err != nil {
+          log.Fatal().Msgf("Failed to create migration driver: %v", err)
+      }
 
-       // Start the web server
-       r := gin.Default()
-       r.POST("/login", handlers.Login)
-       protected := r.Group("/protected")
-       protected.Use(middleware.JWTAuthMiddleware())
-       {
-           protected.GET("/", handlers.ProtectedEndpoint)
-       }
-       log.Info().Msg("Server is starting on port 8080")
-       r.Run("0.0.0.0:8080")
-   }
-   ```
+      // Create the migration instance using the iofs source and database driver
+      m, err := migrate.NewWithInstance("iofs", sourceDriver, "postgres", driver)
+      if err != nil {
+          log.Fatal().Msgf("Failed to create migration instance: %v", err)
+      }
+
+      // Run the migrations
+      if err := m.Up(); err != nil && err != migrate.ErrNoChange {
+          log.Fatal().Msgf("Migration failed: %v", err)
+      } else {
+          log.Info().Msg("Migrations applied successfully")
+      }
+    }
+   ````
 
 ### Final Tips:
 - **Order of Migrations**: Ensure the migration files are numbered sequentially (e.g., `001`, `002`) to apply them in the correct order.
 - **Rollback**: The `.down.sql` file should contain the reverse logic of `.up.sql` to undo changes if needed.
-
-With this setup, your migrations will be organized and ready to be run automatically when your application starts.
