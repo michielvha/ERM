@@ -115,6 +115,7 @@ func main() {
     }
     defer dbConn.Close() // Ensure that the connection is closed when the program exits
 
+    os.Setenv("ADMIN_PASSWORD", "secure_admin_password")
     // Run database migrations
     runMigrations(dbConn)
 

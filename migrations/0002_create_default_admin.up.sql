@@ -9,6 +9,7 @@
 DO $$
 BEGIN
     IF NOT EXISTS (SELECT 1 FROM users WHERE username = 'admin') THEN
+        RAISE NOTICE 'Inserting admin user';
         INSERT INTO users (username, password, role, created_at)
         VALUES (
             'admin',
@@ -16,5 +17,7 @@ BEGIN
             'admin',
             NOW()
         );
+    ELSE
+        RAISE NOTICE 'Admin user already exists';
     END IF;
 END $$;
