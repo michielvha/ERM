@@ -6,14 +6,14 @@ This repository details my journey on the creation of a resource management API 
 
 I've been playing with the idea of a distributed cloud system for a while. Such an API might help in building such a platform.
 
-## Nexts steps
+## Next steps
 
 - Created db with a user schema (x)
   - Add admin user in migration (x)
   - Provide ability to create new users
   - Create groups for RBAC
-- Rework the login function to actually care about users, not just the example workflow we have right now.
-
+- Rework the login function to actually care about users, not just the example workflow we have right now. (x)
+- Have a protect endpoint execute armbian build framework based on input headers.
 
 
 
