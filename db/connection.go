@@ -2,6 +2,7 @@ package db
 
 import (
     "os"
+    "fmt"
     "database/sql"
     _ "github.com/lib/pq" // PostgreSQL driver
     "github.com/rs/zerolog/log"
