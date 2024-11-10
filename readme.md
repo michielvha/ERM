@@ -8,13 +8,10 @@ I've been playing with the idea of a distributed cloud system for a while. Such 
 
 ## Next steps
 
-- Created db with a user schema (x)
-  - Add admin user in migration (x)
-  - Provide ability to create new users
-  - Create groups for RBAC
-- Rework the login function to actually care about users, not just the example workflow we have right now. (x)
-- Have a protect endpoint execute armbian build framework based on input headers.
 
+- Provide ability to create new users => Create admin panel with proper RBAC, that allows you to configure new users.
+- Create groups for RBAC
+- Have a protect endpoint execute armbian build framework based on input headers.
 
 
 ### Enhancements
@@ -25,6 +22,9 @@ I've been playing with the idea of a distributed cloud system for a while. Such 
 
 
 ### Change log
+
+**0.1.30**
+- Binary now takes env vars to setup connection with DB, if none are provided it will use the defaults set in code. This is just a fallback for dev env and should never be used in production.
 
 **0.1.29**
 - Added a default admin user to database. DB is migrated with placeholder password, after the initial migrate a function is called to update the password to a secure one based on env var.

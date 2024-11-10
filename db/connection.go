@@ -9,6 +9,7 @@ import (
 )
 
 func InitDB() (*sql.DB, error) {
+    // set connection string to env vars, if none are given use app defaults.
     dbUsername := os.Getenv("POSTGRES_USER")
     if dbUsername == "" {
         dbUsername = "erm_user"
@@ -24,7 +25,9 @@ func InitDB() (*sql.DB, error) {
         dbName = "erm_database"
     }
 
+    // Create connection string
     connStr := fmt.Sprintf("postgresql://%s:%s@db:5432/%s?sslmode=disable", dbUsername, dbPassword, dbName)
+    // Connect to the database
     db, err := sql.Open("postgres", connStr)
     if err != nil {
         log.Fatal().Msgf("Failed to connect to the database:", err)
