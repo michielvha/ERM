@@ -1,6 +1,7 @@
 package db
 
 import (
+    "os"
     "database/sql"
     _ "github.com/lib/pq" // PostgreSQL driver
     "github.com/rs/zerolog/log"
