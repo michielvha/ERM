@@ -4,6 +4,9 @@ services:
     container_name: erm
     environment:
       ADMIN_PASSWORD: secure_admin_password
+      POSTGRES_USER: erm_user
+      POSTGRES_PASSWORD: secure_password
+      POSTGRES_DB: erm_database
     depends_on:
       - db
     ports:

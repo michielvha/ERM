@@ -7,7 +7,22 @@ import (
 )
 
 func InitDB() (*sql.DB, error) {
-    connStr := "postgresql://erm_user:secure_password@db:5432/erm_database?sslmode=disable" // TODO: remove hardcoding from var to env var.
+    dbUsername := os.Getenv("POSTGRES_USER")
+    if dbUsername == "" {
+        dbUsername = "erm_user"
+    }
+
+    dbPassword := os.Getenv("POSTGRES_PASSWORD")
+    if dbPassword == "" {
+        dbPassword = "secure_password"
+    }
+
+    dbName := os.Getenv("POSTGRES_DB")
+    if dbName == "" {
+        dbName = "erm_database"
+    }
+
+    connStr := fmt.Sprintf("postgresql://%s:%s@db:5432/%s?sslmode=disable", dbUsername, dbPassword, dbName)
     db, err := sql.Open("postgres", connStr)
     if err != nil {
         log.Fatal().Msgf("Failed to connect to the database:", err)
