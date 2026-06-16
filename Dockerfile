@@ -17,7 +17,7 @@ COPY . .
 RUN go build -o main .
 
 # Stage 2: Create a smaller image for running the Go application
-FROM alpine:3.23.3
+FROM alpine:3.24.1
 
 # Install certificates for HTTPS if needed
 RUN apk --no-cache add ca-certificates
